@@ -11,10 +11,12 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",
-    "test": "npm run build && node --test dist/test/transports.test.js"
+    "test": "npm run build && node --test dist/test/transports.test.js dist/test/cloud.test.js dist/test/accessories.test.js",
+    "smoke:cloud": "npm run build && node dist/scripts/cloud-smoke.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "homebridge": "^1.8.0 || ^2.0.0"
   },
   "keywords": [
     "homebridge-plugin",

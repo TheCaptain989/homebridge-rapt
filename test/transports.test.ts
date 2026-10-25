@@ -18,20 +18,17 @@ test("all agreed RAPT device families are represented", () => {
 });
 
 test("transport selection creates the requested adapter", () => {
-  assert.ok(createTransport("cloud") instanceof CloudRaptTransport);
-  assert.ok(createTransport("local") instanceof LocalRaptTransport);
+  assert.ok(createTransport({ platform: "RAPT", transport: "cloud" }) instanceof CloudRaptTransport);
+  assert.ok(createTransport({ platform: "RAPT", transport: "local" }) instanceof LocalRaptTransport);
 });
 
-test("cloud adapter fails clearly until its protocol is implemented", async () => {
-  await assert.rejects(
-    createTransport("cloud").discoverDevices(),
-    TransportUnavailableError
-  );
+test("transport defaults to cloud when not configured", () => {
+  assert.ok(createTransport({ platform: "RAPT" }) instanceof CloudRaptTransport);
 });
 
 test("local adapter fails clearly until its protocol is implemented", async () => {
   await assert.rejects(
-    createTransport("local").discoverDevices(),
+    createTransport({ platform: "RAPT", transport: "local" }).discoverDevices(),
     TransportUnavailableError
   );
 });

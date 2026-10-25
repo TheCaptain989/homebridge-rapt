@@ -4,7 +4,9 @@ A TypeScript Homebridge dynamic-platform plugin scaffold for KegLand RAPT device
 
 ## Status
 
-The plugin structure, configuration, device model, and cloud/local transport interfaces are in place. The RAPT cloud and local protocols are not implemented because a stable public protocol specification was not available during setup. The adapters report an explicit error instead of sending guessed requests. No accessories or readings are exposed until a verified transport is added.
+The cloud transport authenticates against the RAPT API ([swagger](https://api.rapt.io/swagger/v1/swagger.json)) and reads devices and their current telemetry (read-only). Pills appear in HomeKit as temperature sensors with a battery level. BrewZillas, temperature controllers, and fermentation chambers appear as read-only thermostats. Readings are refreshed every `pollingInterval` seconds. The local transport is not implemented and reports an explicit error.
+
+This API belongs to the legacy RAPT portal. KegLand is moving devices to the new RAPT Brew back end (brew.rapt.io), which has no published API yet. A device on new firmware (for example Pill firmware 2.0) may stay listed in the legacy API but stop sending it new readings.
 
 ## Development
 
@@ -27,19 +29,34 @@ Add the platform to the Homebridge configuration:
   "platforms": [
     {
       "platform": "RAPT",
-      "transport": "cloud"
+      "transport": "cloud",
+      "username": "you@example.com",
+      "apiSecret": "<RAPT API secret>",
+      "pollingInterval": 300
     }
   ]
 }
 ```
 
-Set `transport` to `cloud` or `local`. Both values currently select their corresponding adapter boundary, but neither can connect to devices until its protocol is implemented.
+| Field | Description |
+| --- | --- |
+| `transport` | `cloud` (default) or `local`. Only `cloud` works today. |
+| `username` | Email address of your RAPT account. |
+| `apiSecret` | An API secret, **not** your account password. Create one in the RAPT portal under My Account → API Secrets. |
+| `pollingInterval` | Seconds between telemetry reads (default 300, minimum 60). The RAPT API is rate limited. |
+
+### Checking cloud access
+
+To verify credentials and see what the API returns without running Homebridge:
+
+```sh
+RAPT_USERNAME=you@example.com RAPT_API_SECRET=... npm run smoke:cloud
+```
 
 ## Project layout
 
 - `src/platform.ts` registers the Homebridge dynamic platform and handles discovery errors.
 - `src/devices.ts` and `src/types.ts` define the four device families and telemetry model.
 - `src/transports/` contains the cloud/local adapter boundary.
-- `test/transports.test.ts` checks device coverage and transport behavior.
-
-To complete device support, implement and test the official/local transport protocol in the corresponding adapter before publishing or installing this plugin for live use.
+- `test/` checks device coverage, transport selection, and the cloud client against a fake API.
+- `scripts/cloud-smoke.ts` exercises the cloud transport against the real API.

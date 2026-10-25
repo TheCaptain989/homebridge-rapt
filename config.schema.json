@@ -2,7 +2,7 @@
   "pluginAlias": "RAPT",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Connect RAPT devices to Homebridge.",
+  "headerDisplay": "Connect RAPT devices to Homebridge. Cloud access needs an API secret created in the RAPT portal under My Account → API Secrets.",
   "schema": {
     "type": "object",
     "properties": {
@@ -16,6 +16,32 @@
         "type": "string",
         "enum": ["cloud", "local"],
         "default": "cloud"
+      },
+      "username": {
+        "title": "RAPT account email",
+        "type": "string",
+        "format": "email",
+        "condition": {
+          "functionBody": "return model.transport !== 'local';"
+        }
+      },
+      "apiSecret": {
+        "title": "RAPT API secret",
+        "description": "Create one in the RAPT portal under My Account → API Secrets. This is not your account password.",
+        "type": "string",
+        "x-schema-form": {
+          "type": "password"
+        },
+        "condition": {
+          "functionBody": "return model.transport !== 'local';"
+        }
+      },
+      "pollingInterval": {
+        "title": "Polling interval (seconds)",
+        "description": "How often to read telemetry from the RAPT cloud. The API is rate limited, so keep this modest.",
+        "type": "integer",
+        "default": 300,
+        "minimum": 60
       }
     },
     "required": ["platform", "transport"]
