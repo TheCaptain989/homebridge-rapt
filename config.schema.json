@@ -1,0 +1,23 @@
+{
+  "pluginAlias": "RAPT",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Connect RAPT devices to Homebridge.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "type": "string",
+        "const": "RAPT",
+        "default": "RAPT"
+      },
+      "transport": {
+        "title": "Transport",
+        "type": "string",
+        "enum": ["cloud", "local"],
+        "default": "cloud"
+      }
+    },
+    "required": ["platform", "transport"]
+  }
+}

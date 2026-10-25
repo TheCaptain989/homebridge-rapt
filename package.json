@@ -1,0 +1,35 @@
+{
+  "name": "homebridge-rapt",
+  "version": "0.1.0",
+  "description": "Homebridge platform for KegLand RAPT devices",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist",
+    "config.schema.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "npm run build && node --test dist/test/transports.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "rapt",
+    "kegland"
+  ],
+  "peerDependencies": {
+    "homebridge": "^1.8.0 || ^2.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^20.12.7",
+    "eslint": "^9.0.0",
+    "homebridge": "^1.8.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.0"
+  }
+}
