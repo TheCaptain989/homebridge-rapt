@@ -4,6 +4,7 @@ export type TransportMode = "cloud" | "local";
 
 export interface RaptPlatformConfig {
   platform: string;
+  name?: string;
   transport?: TransportMode;
   username?: string;
   apiSecret?: string;

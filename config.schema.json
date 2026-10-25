@@ -6,9 +6,10 @@
   "schema": {
     "type": "object",
     "properties": {
-      "platform": {
+      "name": {
+        "title": "Name",
+        "description": "Name shown in the logs.",
         "type": "string",
-        "const": "RAPT",
         "default": "RAPT"
       },
       "transport": {
@@ -44,6 +45,6 @@
         "minimum": 60
       }
     },
-    "required": ["platform", "transport"]
+    "required": ["name", "transport"]
   }
 }

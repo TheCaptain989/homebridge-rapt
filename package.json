@@ -1,8 +1,9 @@
 {
   "name": "homebridge-rapt",
-  "displayName": "Homebridge RAPT",
+  "displayName": "RAPT",
   "version": "0.1.0",
   "description": "Homebridge platform for KegLand RAPT devices",
+  "author": "TheCaptain989",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "files": [
