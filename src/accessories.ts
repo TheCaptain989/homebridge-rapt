@@ -15,6 +15,15 @@ const LOW_BATTERY_PERCENT = 20;
 const TARGET_MIN_C = -20;
 const TARGET_MAX_C = 100;
 
+// HomeKit names must start and end with a letter or number and avoid most symbols.
+export function homeKitName(name: string): string {
+  const cleaned = name
+    .replace(/[^\p{L}\p{N} '.,-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, "");
+  return cleaned || "RAPT Device";
+}
+
 export type ThermostatMode = "off" | "heat" | "cool" | "auto";
 
 export function targetMode({ heatingEnabled, coolingEnabled }: RaptTelemetry): ThermostatMode {
@@ -53,26 +62,39 @@ export class RaptAccessory {
     readonly device: RaptDevice
   ) {
     const { Characteristic, Perms, Service } = api.hap;
+    const name = homeKitName(device.name);
+    if (accessory.displayName !== name) {
+      accessory.updateDisplayName(name);
+    }
 
     accessory.getService(Service.AccessoryInformation)!
+      .setCharacteristic(Characteristic.Name, name)
       .setCharacteristic(Characteristic.Manufacturer, "KegLand")
       .setCharacteristic(Characteristic.Model, MODEL_NAMES[device.kind])
       .setCharacteristic(Characteristic.SerialNumber, device.id);
 
     if (device.kind === "pill") {
       this.primary = accessory.getService(Service.TemperatureSensor)
-        ?? accessory.addService(Service.TemperatureSensor, device.name);
+        ?? accessory.addService(Service.TemperatureSensor, name);
+      this.rename(this.primary, name);
       this.battery = accessory.getService(Service.Battery) ?? accessory.addService(Service.Battery);
       return;
     }
 
     // Read-only until device control is implemented.
     const readOnly = { perms: [Perms.PAIRED_READ, Perms.NOTIFY] };
-    this.primary = accessory.getService(Service.Thermostat) ?? accessory.addService(Service.Thermostat, device.name);
+    this.primary = accessory.getService(Service.Thermostat) ?? accessory.addService(Service.Thermostat, name);
+    this.rename(this.primary, name);
     this.primary.getCharacteristic(Characteristic.TargetTemperature)
       .setProps({ ...readOnly, minValue: TARGET_MIN_C, maxValue: TARGET_MAX_C });
     this.primary.getCharacteristic(Characteristic.TargetHeatingCoolingState).setProps(readOnly);
     this.primary.getCharacteristic(Characteristic.TemperatureDisplayUnits).setProps(readOnly);
+  }
+
+  // The cache restores services from displayName, so keep it in step with Name.
+  private rename(service: Service, name: string): void {
+    service.displayName = name;
+    service.setCharacteristic(this.api.hap.Characteristic.Name, name);
   }
 
   update(telemetry: RaptTelemetry): void {

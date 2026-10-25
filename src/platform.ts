@@ -5,7 +5,7 @@ import type {
   PlatformAccessory,
   PlatformConfig
 } from "homebridge";
-import { RaptAccessory } from "./accessories";
+import { homeKitName, RaptAccessory } from "./accessories";
 import { PLATFORM_NAME, PLUGIN_NAME } from "./settings";
 import { createTransport } from "./transports";
 import type { RaptTransport } from "./transports";
@@ -74,19 +74,26 @@ export class RaptPlatform implements DynamicPlatformPlugin {
     this.log.info(`RAPT ${this.transport.mode} discovered ${devices.length} device(s).`);
 
     const discovered = new Set<string>();
+    const restored: PlatformAccessory[] = [];
     for (const device of devices) {
       const uuid = this.api.hap.uuid.generate(`${PLUGIN_NAME}:${device.id}`);
       discovered.add(uuid);
 
       const cached = this.cachedAccessories.get(uuid);
-      const accessory = cached ?? new this.api.platformAccessory(device.name, uuid);
+      const accessory = cached ?? new this.api.platformAccessory(homeKitName(device.name), uuid);
       this.devices.set(device.id, new RaptAccessory(this.api, accessory, device));
 
-      if (!cached) {
+      if (cached) {
+        restored.push(cached);
+      } else {
         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
         this.cachedAccessories.set(uuid, accessory);
         this.log.info(`Added ${device.kind}: ${device.name} (${device.id})`);
       }
+    }
+    // Persist names and services refreshed on accessories restored from the cache.
+    if (restored.length > 0) {
+      this.api.updatePlatformAccessories(restored);
     }
 
     const removed = [...this.cachedAccessories.values()].filter((accessory) => !discovered.has(accessory.UUID));

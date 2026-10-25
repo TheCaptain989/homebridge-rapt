@@ -1,5 +1,6 @@
 {
   "name": "homebridge-rapt",
+  "displayName": "Homebridge RAPT",
   "version": "0.1.0",
   "description": "Homebridge platform for KegLand RAPT devices",
   "main": "dist/src/index.js",

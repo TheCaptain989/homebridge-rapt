@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { currentMode, targetMode } from "../src/accessories";
+import { currentMode, homeKitName, targetMode } from "../src/accessories";
+
+test("device names are made valid for HomeKit", () => {
+  assert.equal(homeKitName("Pill (Orange)"), "Pill Orange");
+  assert.equal(homeKitName("Beer Fridge"), "Beer Fridge");
+  assert.equal(homeKitName("Brewer's #1 Fermenter!"), "Brewer's 1 Fermenter");
+  assert.equal(homeKitName("🍺"), "RAPT Device");
+});
 
 test("thermostat target mode reflects which modes are enabled", () => {
   assert.equal(targetMode({ heatingEnabled: true, coolingEnabled: true }), "auto");
