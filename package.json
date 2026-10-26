@@ -3,6 +3,7 @@
   "displayName": "RAPT",
   "version": "0.1.0",
   "description": "Homebridge platform for KegLand RAPT devices",
+  "license": "MIT",
   "author": "TheCaptain989",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
